@@ -8,8 +8,8 @@ class GoRouterConfig {
   final List<GoRouterConfig>? children;
   final String path;
   final String label;
-  final Widget icon;
-  final Widget iconSelected;
+  final Widget? icon;
+  final Widget? iconSelected;
   final GoRouterWidgetBuilder builder;
 
   GoRouterConfig({
@@ -18,8 +18,8 @@ class GoRouterConfig {
     required this.builder,
     this.parent,
     this.children,
-    required this.icon,
-    required this.iconSelected,
+    this.icon,
+    this.iconSelected,
   });
 }
 
@@ -76,6 +76,7 @@ class GoRouterApp extends StatelessWidget {
     return MaterialApp.router(
       // showPerformanceOverlay: true,
       // showSemanticsDebugger: true,
+      restorationScopeId: 'goRouterApp',
       debugShowCheckedModeBanner: false,
       scaffoldMessengerKey: scaffoldMessengerKey,
       localizationsDelegates: localizationsDelegates,
