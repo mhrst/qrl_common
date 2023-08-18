@@ -2,14 +2,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:go_router/go_router.dart' hide GoRouterHelper;
-import 'package:qrl_common/flutter.dart';
+import 'package:qrl_common/src/flutter/app.dart';
+import 'package:qrl_common/src/flutter/router.dart';
 
 class AdaptiveGoRouterApp extends GoRouterApp {
   final Map<Breakpoint, Widget Function(BuildContext context)> topNavigation;
   final Map<Breakpoint, Widget Function(BuildContext context)>
       secondaryNavigation;
-  final Widget Function(BuildContext context, Widget child)? bodyBuilderSmall;
-  final Widget Function(BuildContext context, Widget child)? bodyBuilderMedium;
+  final Widget Function(BuildContext context, Widget child)?
+      bottomNavigationBuilder;
+  final Widget Function(BuildContext context, Widget child, bool isExtended)?
+      primaryNavigationBuilder;
+  final Widget Function(BuildContext context, Widget child)? smallBodyBuilder;
+  final Widget Function(BuildContext context, Widget child)? mediumBodyBuilder;
   final Widget Function(BuildContext context, Widget child)?
       secondaryBodyBuilder;
 
@@ -18,9 +23,11 @@ class AdaptiveGoRouterApp extends GoRouterApp {
     required super.routes,
     this.topNavigation = const {},
     this.secondaryNavigation = const {},
-    this.bodyBuilderSmall,
-    this.bodyBuilderMedium,
+    this.smallBodyBuilder,
+    this.mediumBodyBuilder,
     this.secondaryBodyBuilder,
+    this.bottomNavigationBuilder,
+    this.primaryNavigationBuilder,
     super.key,
     super.theme,
     super.darkTheme,
@@ -84,62 +91,75 @@ class AdaptiveGoRouterApp extends GoRouterApp {
                 ),
 
                 // Built-in navigation bar for small screens
-                bottomNavigation: destinations.length >= 2
-                    ? SlotLayout(
-                        config: <Breakpoint, SlotLayoutConfig>{
-                          Breakpoints.small: SlotLayout.from(
-                            key: const Key('Bottom Navigation Small'),
-                            inAnimation: AdaptiveScaffold.bottomToTop,
-                            outAnimation: AdaptiveScaffold.topToBottom,
-                            builder: (_) =>
-                                AdaptiveScaffold.standardBottomNavigationBar(
-                              destinations: destinations,
-                              currentIndex: selectedIndex,
-                              onDestinationSelected: (int newIndex) =>
-                                  context.go(routes[newIndex].path),
-                            ),
-                          )
-                        },
-                      )
-                    : null,
+                bottomNavigation: SlotLayout(
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    if (bottomNavigationBuilder != null) ...{
+                      Breakpoints.small: SlotLayout.from(
+                        key: const Key('Bottom Navigation Small'),
+                        inAnimation: AdaptiveScaffold.bottomToTop,
+                        outAnimation: AdaptiveScaffold.topToBottom,
+                        builder: (_) => bottomNavigationBuilder!(
+                          context,
+                          destinations.length >= 2
+                              ? AdaptiveScaffold.standardBottomNavigationBar(
+                                  destinations: destinations,
+                                  currentIndex: selectedIndex,
+                                  onDestinationSelected: (int newIndex) =>
+                                      context.go(routes[newIndex].path),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                    },
+                  },
+                ),
 
                 // Built-in navigation bar for medium and larger screens
-                primaryNavigation: destinations.length >= 2
-                    ? SlotLayout(
-                        config: <Breakpoint, SlotLayoutConfig>{
-                          Breakpoints.medium: SlotLayout.from(
-                            inAnimation: AdaptiveScaffold.leftOutIn,
-                            key: const Key('Primary Navigation Medium'),
-                            builder: (_) =>
-                                AdaptiveScaffold.standardNavigationRail(
-                              selectedIndex: selectedIndex,
-                              onDestinationSelected: (int newIndex) =>
-                                  context.go(routes[newIndex].path),
-                              destinations: destinations
-                                  .map((_) =>
-                                      AdaptiveScaffold.toRailDestination(_))
-                                  .toList(),
-                            ),
-                          ),
-                          Breakpoints.large: SlotLayout.from(
-                            key: const Key('Primary Navigation Large'),
-                            inAnimation: AdaptiveScaffold.leftOutIn,
-                            builder: (_) =>
-                                AdaptiveScaffold.standardNavigationRail(
-                              extended: true,
-                              selectedIndex: selectedIndex,
-                              onDestinationSelected: (int newIndex) =>
-                                  context.go(routes[newIndex].path),
-                              destinations: destinations
-                                  .map((_) =>
-                                      AdaptiveScaffold.toRailDestination(_))
-                                  .toList(),
-                            ),
-                          ),
-                        },
-                      )
-                    : null,
-
+                primaryNavigation: SlotLayout(
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    if (primaryNavigationBuilder != null) ...{
+                      Breakpoints.medium: SlotLayout.from(
+                        inAnimation: AdaptiveScaffold.leftOutIn,
+                        key: const Key('Primary Navigation Medium'),
+                        builder: (_) => primaryNavigationBuilder!(
+                          context,
+                          destinations.length > 1
+                              ? AdaptiveScaffold.standardNavigationRail(
+                                  selectedIndex: selectedIndex,
+                                  onDestinationSelected: (int newIndex) =>
+                                      context.go(routes[newIndex].path),
+                                  destinations: destinations
+                                      .map((_) =>
+                                          AdaptiveScaffold.toRailDestination(_))
+                                      .toList(),
+                                )
+                              : const SizedBox.shrink(),
+                          false,
+                        ),
+                      ),
+                      Breakpoints.large: SlotLayout.from(
+                        key: const Key('Primary Navigation Large'),
+                        inAnimation: AdaptiveScaffold.leftOutIn,
+                        builder: (_) => primaryNavigationBuilder!(
+                          context,
+                          destinations.length > 1
+                              ? AdaptiveScaffold.standardNavigationRail(
+                                  extended: true,
+                                  selectedIndex: selectedIndex,
+                                  onDestinationSelected: (int newIndex) =>
+                                      context.go(routes[newIndex].path),
+                                  destinations: destinations
+                                      .map((_) =>
+                                          AdaptiveScaffold.toRailDestination(_))
+                                      .toList(),
+                                )
+                              : const SizedBox.shrink(),
+                          true,
+                        ),
+                      ),
+                    },
+                  },
+                ),
                 secondaryNavigation: SlotLayout(
                   config: <Breakpoint, SlotLayoutConfig>{
                     for (var entry in secondaryNavigation.entries)
@@ -152,16 +172,16 @@ class AdaptiveGoRouterApp extends GoRouterApp {
                 ),
                 body: SlotLayout(
                   config: <Breakpoint, SlotLayoutConfig>{
-                    if (bodyBuilderSmall != null)
+                    if (smallBodyBuilder != null)
                       Breakpoints.smallAndUp: SlotLayout.from(
                         key: const Key('Body Small'),
-                        builder: (context) => bodyBuilderSmall!(context, child),
+                        builder: (context) => smallBodyBuilder!(context, child),
                       ),
-                    if (bodyBuilderMedium != null)
+                    if (mediumBodyBuilder != null)
                       Breakpoints.mediumAndUp: SlotLayout.from(
                         key: const Key('Body Medium'),
                         builder: (context) =>
-                            bodyBuilderMedium!(context, child),
+                            mediumBodyBuilder!(context, child),
                       ),
                   },
                 ),

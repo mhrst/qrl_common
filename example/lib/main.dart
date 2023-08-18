@@ -8,8 +8,8 @@ void main() async {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
     ),
-    bodyBuilderSmall: (context, child) => child,
-    bodyBuilderMedium: (context, child) {
+    smallBodyBuilder: (context, child) => child,
+    mediumBodyBuilder: (context, child) {
       return GridView.count(
         crossAxisCount: 2,
         children: List.generate(10, (index) => index)
