@@ -8,11 +8,11 @@ import 'package:qrl_common/src/flutter/router.dart';
 class AdaptiveGoRouterApp extends GoRouterApp {
   final Map<Breakpoint, Widget Function(BuildContext context)> topNavigation;
   final Map<Breakpoint, Widget Function(BuildContext context)>
+      primaryNavigation;
+  final Map<Breakpoint, Widget Function(BuildContext context)>
       secondaryNavigation;
   final Widget Function(BuildContext context, Widget child)?
       bottomNavigationBuilder;
-  final Widget Function(BuildContext context, Widget child, bool isExtended)?
-      primaryNavigationBuilder;
   final Widget Function(BuildContext context, Widget child)? smallBodyBuilder;
   final Widget Function(BuildContext context, Widget child)? mediumBodyBuilder;
   final Widget Function(BuildContext context, Widget child)?
@@ -22,12 +22,12 @@ class AdaptiveGoRouterApp extends GoRouterApp {
     required super.appName,
     required super.routes,
     this.topNavigation = const {},
+    this.primaryNavigation = const {},
     this.secondaryNavigation = const {},
     this.smallBodyBuilder,
     this.mediumBodyBuilder,
     this.secondaryBodyBuilder,
     this.bottomNavigationBuilder,
-    this.primaryNavigationBuilder,
     super.key,
     super.theme,
     super.darkTheme,
@@ -90,6 +90,17 @@ class AdaptiveGoRouterApp extends GoRouterApp {
                   },
                 ),
 
+                primaryNavigation: SlotLayout(
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    for (var entry in primaryNavigation.entries)
+                      entry.key: SlotLayout.from(
+                        inAnimation: AdaptiveScaffold.leftOutIn,
+                        key: const Key('Primary Navigation'),
+                        builder: (context) => entry.value(context),
+                      ),
+                  },
+                ),
+
                 // Built-in navigation bar for small screens
                 bottomNavigation: SlotLayout(
                   config: <Breakpoint, SlotLayoutConfig>{
@@ -114,52 +125,6 @@ class AdaptiveGoRouterApp extends GoRouterApp {
                   },
                 ),
 
-                // Built-in navigation bar for medium and larger screens
-                primaryNavigation: SlotLayout(
-                  config: <Breakpoint, SlotLayoutConfig>{
-                    if (primaryNavigationBuilder != null) ...{
-                      Breakpoints.medium: SlotLayout.from(
-                        inAnimation: AdaptiveScaffold.leftOutIn,
-                        key: const Key('Primary Navigation Medium'),
-                        builder: (_) => primaryNavigationBuilder!(
-                          context,
-                          destinations.length > 1
-                              ? AdaptiveScaffold.standardNavigationRail(
-                                  selectedIndex: selectedIndex,
-                                  onDestinationSelected: (int newIndex) =>
-                                      context.go(routes[newIndex].path),
-                                  destinations: destinations
-                                      .map((_) =>
-                                          AdaptiveScaffold.toRailDestination(_))
-                                      .toList(),
-                                )
-                              : const SizedBox.shrink(),
-                          false,
-                        ),
-                      ),
-                      Breakpoints.large: SlotLayout.from(
-                        key: const Key('Primary Navigation Large'),
-                        inAnimation: AdaptiveScaffold.leftOutIn,
-                        builder: (_) => primaryNavigationBuilder!(
-                          context,
-                          destinations.length > 1
-                              ? AdaptiveScaffold.standardNavigationRail(
-                                  extended: true,
-                                  selectedIndex: selectedIndex,
-                                  onDestinationSelected: (int newIndex) =>
-                                      context.go(routes[newIndex].path),
-                                  destinations: destinations
-                                      .map((_) =>
-                                          AdaptiveScaffold.toRailDestination(_))
-                                      .toList(),
-                                )
-                              : const SizedBox.shrink(),
-                          true,
-                        ),
-                      ),
-                    },
-                  },
-                ),
                 secondaryNavigation: SlotLayout(
                   config: <Breakpoint, SlotLayoutConfig>{
                     for (var entry in secondaryNavigation.entries)

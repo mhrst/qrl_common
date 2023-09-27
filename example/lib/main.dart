@@ -8,37 +8,95 @@ void main() async {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
     ),
+    primaryNavigation: {
+      Breakpoints.large: (context) => const NavigationDrawer(
+            children: [
+              NavigationDrawerDestination(
+                label: Text('Home'),
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+              ),
+            ],
+          ),
+    },
+    secondaryNavigation: {
+      Breakpoints.large: (context) => const NavigationDrawer(
+            children: [
+              NavigationDrawerDestination(
+                label: Text('Home'),
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+              ),
+            ],
+          ),
+    },
     smallBodyBuilder: (context, child) => child,
     mediumBodyBuilder: (context, child) {
-      return GridView.count(
-        crossAxisCount: 2,
-        children: List.generate(10, (index) => index)
-            .map((e) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    height: 400,
-                  ),
-                ))
-            .toList(),
+      return Container(
+        color: Colors.black12,
+        child: Center(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 600),
+            child: child,
+          ),
+        ),
       );
     },
-    secondaryBodyBuilder: (context, child) {
-      if (context.uri?.path == kHomeRoutePath) {
-        return Scaffold(
-            body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Home',
-            style: Theme.of(context).textTheme.displayLarge,
-          ),
-        ));
-      }
-      return child;
-    },
+    // secondaryBodyBuilder: (context, child) {
+    //   if (context.uri?.path == kHomeRoutePath) {
+    //     return Scaffold(
+    //         body: Padding(
+    //       padding: const EdgeInsets.all(8.0),
+    //       child: Text(
+    //         'Home',
+    //         style: Theme.of(context).textTheme.displayLarge,
+    //       ),
+    //     ));
+    //   }
+    //   return child;
+    // },
     routes: [
       GoRouterConfig(
-        builder: (context, state) => const Scaffold(body: HomeView()),
+        builder: (context, state) => Scaffold(
+          body: SingleChildScrollView(
+            child: Container(
+              height: 2000,
+              child: Row(
+                children: [
+                  Text('Home'),
+                ],
+              ),
+              color: const Color(0xFFefebc6),
+            ),
+          ),
+          bottomSheet: Container(
+            // height: 200,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) => const SizedBox.expand());
+                    },
+                    icon: const Icon(Icons.fork_left),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) => const SizedBox.expand());
+                    },
+                    icon: const Icon(Icons.fork_right),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         label: 'Home',
         path: kHomeRoutePath,
         icon: const Icon(Icons.home_outlined),
@@ -47,10 +105,10 @@ void main() async {
       ),
       GoRouterConfig(
         builder: (context, state) => const Scaffold(body: ContactView()),
-        label: 'Contact',
-        path: '/contact',
-        icon: const Icon(Icons.alternate_email_outlined),
-        iconSelected: const Icon(Icons.alternate_email),
+        label: 'Notes',
+        path: '/notes',
+        icon: const Icon(Icons.note_add_outlined),
+        iconSelected: const Icon(Icons.note_add),
       ),
     ],
   ));
