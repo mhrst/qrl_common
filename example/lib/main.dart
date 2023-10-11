@@ -2,59 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:qrl_common/flutter.dart';
 
 void main() async {
-  runApp(AdaptiveGoRouterApp(
+  runApp(GoRouterApp(
     appName: 'Example',
     theme: ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
     ),
-    primaryNavigation: {
-      Breakpoints.large: (context) => const NavigationDrawer(
-            children: [
-              NavigationDrawerDestination(
-                label: Text('Home'),
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-              ),
-            ],
-          ),
-    },
-    secondaryNavigation: {
-      Breakpoints.large: (context) => const NavigationDrawer(
-            children: [
-              NavigationDrawerDestination(
-                label: Text('Home'),
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-              ),
-            ],
-          ),
-    },
-    smallBodyBuilder: (context, child) => child,
-    mediumBodyBuilder: (context, child) {
-      return Container(
-        color: Colors.black12,
-        child: Center(
-          child: Container(
-            constraints: BoxConstraints(maxWidth: 600),
-            child: child,
-          ),
-        ),
-      );
-    },
-    // secondaryBodyBuilder: (context, child) {
-    //   if (context.uri?.path == kHomeRoutePath) {
-    //     return Scaffold(
-    //         body: Padding(
-    //       padding: const EdgeInsets.all(8.0),
-    //       child: Text(
-    //         'Home',
-    //         style: Theme.of(context).textTheme.displayLarge,
-    //       ),
-    //     ));
-    //   }
-    //   return child;
-    // },
     routes: [
       GoRouterConfig(
         builder: (context, state) => Scaffold(
