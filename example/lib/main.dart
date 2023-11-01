@@ -14,54 +14,47 @@ void main() async {
           body: SingleChildScrollView(
             child: Container(
               height: 2000,
-              child: Row(
+              color: const Color(0xFFefebc6),
+              child: const Row(
                 children: [
                   Text('Home'),
                 ],
               ),
-              color: const Color(0xFFefebc6),
             ),
           ),
-          bottomSheet: Container(
-            // height: 200,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) => const SizedBox.expand());
-                    },
-                    icon: const Icon(Icons.fork_left),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) => const SizedBox.expand());
-                    },
-                    icon: const Icon(Icons.fork_right),
-                  ),
-                ],
-              ),
+          bottomSheet: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) => const SizedBox.expand());
+                  },
+                  icon: const Icon(Icons.fork_left),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) => const SizedBox.expand());
+                  },
+                  icon: const Icon(Icons.fork_right),
+                ),
+              ],
             ),
           ),
         ),
-        label: 'Home',
+        name: 'Home',
         path: kHomeRoutePath,
-        icon: const Icon(Icons.home_outlined),
-        iconSelected: const Icon(Icons.home),
         children: [],
       ),
       GoRouterConfig(
         builder: (context, state) => const Scaffold(body: ContactView()),
-        label: 'Notes',
+        name: 'Notes',
         path: '/notes',
-        icon: const Icon(Icons.note_add_outlined),
-        iconSelected: const Icon(Icons.note_add),
       ),
     ],
   ));

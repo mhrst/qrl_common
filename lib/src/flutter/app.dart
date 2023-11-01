@@ -4,22 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:qrl_common/src/flutter/router.dart';
 
 class GoRouterConfig {
-  final GoRouterConfig? parent;
-  final List<GoRouterConfig>? children;
+  final String name;
   final String path;
-  final String label;
-  final Widget? icon;
-  final Widget? iconSelected;
   final GoRouterWidgetBuilder builder;
+  final List<GoRouterConfig>? children;
 
   GoRouterConfig({
-    required this.label,
+    required this.name,
     required this.path,
     required this.builder,
-    this.parent,
     this.children,
-    this.icon,
-    this.iconSelected,
   });
 }
 
@@ -35,6 +29,8 @@ class GoRouterApp extends StatelessWidget {
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
   final Iterable<Locale> supportedLocales;
   final Widget Function(BuildContext, GoRouterState)? errorBuilder;
+  final Widget Function(BuildContext, GoRouterState, Widget)? shellBuilder;
+  final List<NavigatorObserver>? observers;
 
   GoRouterApp({
     super.key,
@@ -48,10 +44,15 @@ class GoRouterApp extends StatelessWidget {
     this.supportedLocales = const <Locale>[Locale('en', 'US')],
     this.initialLocation = kHomeRoutePath,
     this.errorBuilder,
+    this.shellBuilder,
+    this.observers,
   });
 
   GoRouter get routerConfig => GoRouter(
-        routes: routesBuilder(routes),
+        observers: observers,
+        routes: shellBuilder == null
+            ? routesBuilder(routes)
+            : [shellRouteBuilder(shellBuilder, routes, observers)],
         debugLogDiagnostics: !kReleaseMode,
         initialLocation: initialLocation,
         errorBuilder: errorBuilder,

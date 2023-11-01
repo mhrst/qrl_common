@@ -29,17 +29,14 @@ ShellRoute shellRouteBuilder(
       observers: observers,
     );
 
-List<GoRoute> routesBuilder(
-  List<GoRouterConfig> routes, [
-  String parentPath = '',
-]) {
+List<GoRoute> routesBuilder(List<GoRouterConfig> routes) {
   return [
     for (final route in routes)
       GoRoute(
+        name: route.name,
         path: route.path,
-        name: route.path,
         builder: route.builder,
-        routes: routesBuilder(route.children ?? [], route.path),
+        routes: routesBuilder(route.children ?? []),
       ),
   ];
 }
