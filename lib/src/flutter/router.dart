@@ -4,6 +4,33 @@ import 'package:qrl_common/flutter.dart';
 
 const kHomeRoutePath = '/';
 
+List<GoRoute> routesBuilder(List<GoRouterConfig> routes) {
+  return [
+    for (final route in routes)
+      GoRoute(
+        name: route.name,
+        path: route.path,
+        builder: route.builder,
+        parentNavigatorKey: route.parentNavigatorKey,
+        routes: routesBuilder(route.children ?? []),
+      ),
+  ];
+}
+
+List<RouteBase> shellRouteBuilder(
+  Widget Function(BuildContext, GoRouterState, Widget)? shellBuilder,
+  List<GoRouterConfig> routes,
+  GlobalKey<NavigatorState>? navigatorKey, [
+  List<NavigatorObserver>? observers,
+]) =>
+    [
+      ShellRoute(
+          builder: shellBuilder,
+          routes: routesBuilder(routes),
+          observers: observers,
+          navigatorKey: navigatorKey)
+    ];
+
 extension GoRouterExtensions on BuildContext {
   Uri? get uri {
     try {
@@ -13,30 +40,26 @@ extension GoRouterExtensions on BuildContext {
     }
   }
 
-  void go(String location) {
-    GoRouter.of(this).go(location);
-  }
-}
+  bool canPop() => GoRouter.of(this).canPop();
 
-ShellRoute shellRouteBuilder(
-  Widget Function(BuildContext, GoRouterState, Widget)? shellBuilder,
-  List<GoRouterConfig> routes, [
-  List<NavigatorObserver>? observers,
-]) =>
-    ShellRoute(
-      builder: shellBuilder,
-      routes: routesBuilder(routes),
-      observers: observers,
-    );
+  void go(String location) => GoRouter.of(this).go(location);
 
-List<GoRoute> routesBuilder(List<GoRouterConfig> routes) {
-  return [
-    for (final route in routes)
-      GoRoute(
-        name: route.name,
-        path: route.path,
-        builder: route.builder,
-        routes: routesBuilder(route.children ?? []),
-      ),
-  ];
+  void goNamed(
+    String name, {
+    Map<String, String> pathParameters = const {},
+    Map<String, Object?> queryParameters = const {},
+    Object? extra,
+  }) =>
+      GoRouter.of(this).goNamed(name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra);
+
+  void pop({Object? result}) => GoRouter.of(this).pop(result);
+
+  void push(String location, {Object? extra}) =>
+      GoRouter.of(this).push(location, extra: extra);
+
+  void replace(String location, {Object? extra}) =>
+      GoRouter.of(this).replace(location, extra: extra);
 }

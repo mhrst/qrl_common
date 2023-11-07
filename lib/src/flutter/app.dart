@@ -3,22 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qrl_common/src/flutter/router.dart';
 
-class GoRouterConfig {
-  final String name;
-  final String path;
-  final GoRouterWidgetBuilder builder;
-  final List<GoRouterConfig>? children;
-
-  GoRouterConfig({
-    required this.name,
-    required this.path,
-    required this.builder,
-    this.children,
-  });
-}
-
 class GoRouterApp extends StatelessWidget {
-  final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<NavigatorState>? rootNavigatorKey;
+  final GlobalKey<NavigatorState>? shellNavigatorKey;
+  final GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey;
   final String appName;
   final ThemeData? theme;
   final ThemeData? darkTheme;
@@ -28,14 +16,19 @@ class GoRouterApp extends StatelessWidget {
   final String initialLocation;
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
   final Iterable<Locale> supportedLocales;
-  final Widget Function(BuildContext, GoRouterState)? errorBuilder;
-  final Widget Function(BuildContext, GoRouterState, Widget)? shellBuilder;
+  final Widget Function(BuildContext context, GoRouterState state)?
+      errorBuilder;
+  final Widget Function(
+      BuildContext context, GoRouterState state, Widget child)? shellBuilder;
   final List<NavigatorObserver>? observers;
 
-  GoRouterApp({
+  const GoRouterApp({
     super.key,
     required this.appName,
     required this.routes,
+    this.rootNavigatorKey,
+    this.shellNavigatorKey,
+    this.scaffoldMessengerKey,
     this.theme,
     this.darkTheme,
     this.themeMode,
@@ -49,10 +42,12 @@ class GoRouterApp extends StatelessWidget {
   });
 
   GoRouter get routerConfig => GoRouter(
+        navigatorKey: rootNavigatorKey,
         observers: observers,
         routes: shellBuilder == null
             ? routesBuilder(routes)
-            : [shellRouteBuilder(shellBuilder, routes, observers)],
+            : shellRouteBuilder(
+                shellBuilder, routes, shellNavigatorKey, observers),
         debugLogDiagnostics: !kReleaseMode,
         initialLocation: initialLocation,
         errorBuilder: errorBuilder,
@@ -90,4 +85,20 @@ class GoRouterApp extends StatelessWidget {
       routerConfig: routerConfig,
     );
   }
+}
+
+class GoRouterConfig {
+  final String name;
+  final String path;
+  final GoRouterWidgetBuilder builder;
+  final List<GoRouterConfig>? children;
+  final GlobalKey<NavigatorState>? parentNavigatorKey;
+
+  GoRouterConfig({
+    required this.name,
+    required this.path,
+    required this.builder,
+    this.children,
+    this.parentNavigatorKey,
+  });
 }
