@@ -32,12 +32,13 @@ List<RouteBase> shellRouteBuilder(
     ];
 
 extension GoRouterExtensions on BuildContext {
-  Uri? get uri {
-    try {
-      return GoRouterState.of(this).uri;
-    } catch (_) {
-      return null;
-    }
+  Uri get location {
+    final routerDelegate = GoRouter.of(this).routerDelegate;
+    final RouteMatch lastMatch = routerDelegate.currentConfiguration.last;
+    final RouteMatchList matchList = lastMatch is ImperativeRouteMatch
+        ? lastMatch.matches
+        : routerDelegate.currentConfiguration;
+    return matchList.uri;
   }
 
   bool canPop() => GoRouter.of(this).canPop();
@@ -59,6 +60,17 @@ extension GoRouterExtensions on BuildContext {
 
   void push(String location, {Object? extra}) =>
       GoRouter.of(this).push(location, extra: extra);
+
+  void pushNamed(
+    String name, {
+    Map<String, String> pathParameters = const {},
+    Map<String, Object?> queryParameters = const {},
+    Object? extra,
+  }) =>
+      GoRouter.of(this).pushNamed(name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra);
 
   void replace(String location, {Object? extra}) =>
       GoRouter.of(this).replace(location, extra: extra);

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qrl_common/src/flutter/router.dart';
 
-class GoRouterApp extends StatelessWidget {
+class GoRouterApp extends StatefulWidget {
   final GlobalKey<NavigatorState>? rootNavigatorKey;
   final GlobalKey<NavigatorState>? shellNavigatorKey;
   final GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey;
@@ -21,6 +21,8 @@ class GoRouterApp extends StatelessWidget {
   final Widget Function(
       BuildContext context, GoRouterState state, Widget child)? shellBuilder;
   final List<NavigatorObserver>? observers;
+  final TransitionBuilder? builder;
+  final GoRouterRedirect? redirect;
 
   const GoRouterApp({
     super.key,
@@ -39,50 +41,47 @@ class GoRouterApp extends StatelessWidget {
     this.errorBuilder,
     this.shellBuilder,
     this.observers,
+    this.builder,
+    this.redirect,
   });
 
-  GoRouter get routerConfig => GoRouter(
-        navigatorKey: rootNavigatorKey,
-        observers: observers,
-        routes: shellBuilder == null
-            ? routesBuilder(routes)
-            : shellRouteBuilder(
-                shellBuilder, routes, shellNavigatorKey, observers),
-        debugLogDiagnostics: !kReleaseMode,
-        initialLocation: initialLocation,
-        errorBuilder: errorBuilder,
-        redirect: (context, state) {
-          if ([
-            // No redirects on these pages
-          ].contains(state.uri)) {
-            return null;
-          }
+  @override
+  State<GoRouterApp> createState() => _GoRouterAppState();
+}
 
-          // TODO: redirect checks
-
-          return null;
-        },
-
-        // changes on the listenable will cause the router to refresh it's route
-        // refreshListenable: ????,
-      );
+class _GoRouterAppState extends State<GoRouterApp> {
+  late final routerConfig = GoRouter(
+    navigatorKey: widget.rootNavigatorKey,
+    observers: widget.observers,
+    routes: widget.shellBuilder == null
+        ? routesBuilder(widget.routes)
+        : shellRouteBuilder(widget.shellBuilder, widget.routes,
+            widget.shellNavigatorKey, widget.observers),
+    debugLogDiagnostics: !kReleaseMode,
+    initialLocation: widget.initialLocation,
+    errorBuilder: widget.errorBuilder,
+    redirect: widget.redirect,
+  );
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      // showPerformanceOverlay: true,
-      // showSemanticsDebugger: true,
+      key: const ValueKey('go_router_app'),
+      routerConfig: routerConfig,
       restorationScopeId: 'goRouterApp',
       debugShowCheckedModeBanner: false,
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      localizationsDelegates: localizationsDelegates,
-      supportedLocales: supportedLocales,
-      locale: locale,
-      title: appName,
-      theme: theme,
-      darkTheme: darkTheme,
-      themeMode: themeMode,
-      routerConfig: routerConfig,
+      // showPerformanceOverlay: true,
+      // showSemanticsDebugger: true,
+      locale: widget.locale,
+      localizationsDelegates: widget.localizationsDelegates,
+      scaffoldMessengerKey: widget.scaffoldMessengerKey,
+      supportedLocales: widget.supportedLocales,
+      title: widget.appName,
+      builder: widget.builder,
+      // Themes
+      theme: widget.theme,
+      darkTheme: widget.darkTheme,
+      themeMode: widget.themeMode,
     );
   }
 }
