@@ -1,4 +1,4 @@
-T tryCast<T>(Object value, T defaultValue) {
+T tryCast<T>(Object? value, T defaultValue) {
   try {
     return value as T;
   } catch (_) {
