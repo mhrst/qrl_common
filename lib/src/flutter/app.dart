@@ -66,7 +66,6 @@ class _GoRouterAppState extends State<GoRouterApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      key: const ValueKey('go_router_app'),
       routerConfig: routerConfig,
       restorationScopeId: 'goRouterApp',
       debugShowCheckedModeBanner: false,
