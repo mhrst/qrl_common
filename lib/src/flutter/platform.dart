@@ -1,14 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Returns the current [TargetPlatform], or null for web
-TargetPlatform? get kCurrentPlatform {
-  if (kIsWeb) {
-    return null;
-  }
-
-  return defaultTargetPlatform;
-}
-
 bool get kIsAndroid =>
     !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
