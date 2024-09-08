@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:qrl_common/flutter.dart';
 
 const kHomeRoutePath = '/';
 
@@ -30,6 +29,22 @@ List<RouteBase> shellRouteBuilder(
           observers: observers,
           navigatorKey: navigatorKey)
     ];
+
+class GoRouterConfig {
+  final String name;
+  final String path;
+  final GoRouterWidgetBuilder builder;
+  final List<GoRouterConfig>? children;
+  final GlobalKey<NavigatorState>? parentNavigatorKey;
+
+  GoRouterConfig({
+    required this.name,
+    required this.path,
+    required this.builder,
+    this.children,
+    this.parentNavigatorKey,
+  });
+}
 
 extension GoRouterExtensions on BuildContext {
   Uri get location {

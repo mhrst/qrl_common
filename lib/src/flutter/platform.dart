@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 bool get kIsAndroid =>
     !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
-bool get kIsCupertino => !kIsWeb && (kIsIOS || kIsMacOS);
+bool get kIsCupertino =>
+    defaultTargetPlatform == TargetPlatform.iOS ||
+    defaultTargetPlatform == TargetPlatform.macOS;
 
 bool get kIsIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 

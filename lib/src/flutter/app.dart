@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:qrl_common/src/flutter/router.dart';
+
+import 'router.dart';
 
 class GoRouterApp extends StatefulWidget {
   final GlobalKey<NavigatorState>? rootNavigatorKey;
@@ -21,6 +22,7 @@ class GoRouterApp extends StatefulWidget {
   final Widget Function(
       BuildContext context, GoRouterState state, Widget child)? shellBuilder;
   final List<NavigatorObserver>? observers;
+  final List<NavigatorObserver>? shellObservers;
   final TransitionBuilder? builder;
   final GoRouterRedirect? redirect;
 
@@ -41,6 +43,7 @@ class GoRouterApp extends StatefulWidget {
     this.errorBuilder,
     this.shellBuilder,
     this.observers,
+    this.shellObservers,
     this.builder,
     this.redirect,
   });
@@ -50,18 +53,31 @@ class GoRouterApp extends StatefulWidget {
 }
 
 class _GoRouterAppState extends State<GoRouterApp> {
-  late final routerConfig = GoRouter(
-    navigatorKey: widget.rootNavigatorKey,
-    observers: widget.observers,
-    routes: widget.shellBuilder == null
-        ? routesBuilder(widget.routes)
-        : shellRouteBuilder(widget.shellBuilder, widget.routes,
-            widget.shellNavigatorKey, widget.observers),
-    debugLogDiagnostics: !kReleaseMode,
-    initialLocation: widget.initialLocation,
-    errorBuilder: widget.errorBuilder,
-    redirect: widget.redirect,
-  );
+  late final GoRouter routerConfig;
+
+  @override
+  void initState() {
+    super.initState();
+    GoRouter.optionURLReflectsImperativeAPIs = true;
+    routerConfig = GoRouter(
+      navigatorKey: widget.rootNavigatorKey,
+      observers: widget.observers,
+      routes: widget.shellBuilder == null
+          ? routesBuilder(widget.routes)
+          : shellRouteBuilder(widget.shellBuilder, widget.routes,
+              widget.shellNavigatorKey, widget.shellObservers),
+      debugLogDiagnostics: !kReleaseMode,
+      initialLocation: widget.initialLocation,
+      errorBuilder: widget.errorBuilder,
+      redirect: widget.redirect,
+    );
+  }
+
+  @override
+  void dispose() {
+    routerConfig.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,20 +99,4 @@ class _GoRouterAppState extends State<GoRouterApp> {
       themeMode: widget.themeMode,
     );
   }
-}
-
-class GoRouterConfig {
-  final String name;
-  final String path;
-  final GoRouterWidgetBuilder builder;
-  final List<GoRouterConfig>? children;
-  final GlobalKey<NavigatorState>? parentNavigatorKey;
-
-  GoRouterConfig({
-    required this.name,
-    required this.path,
-    required this.builder,
-    this.children,
-    this.parentNavigatorKey,
-  });
 }

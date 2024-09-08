@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qrl_common/src/flutter/safe_mounted_state.dart';
 
 class SignInWithGoogleButton extends StatefulWidget {
   final Function()? onTap;
@@ -15,8 +14,7 @@ class SignInWithGoogleButton extends StatefulWidget {
   State<StatefulWidget> createState() => _SignInWithGoogleButtonState();
 }
 
-class _SignInWithGoogleButtonState
-    extends SafeMountedState<SignInWithGoogleButton> {
+class _SignInWithGoogleButtonState extends State<SignInWithGoogleButton> {
   bool disabled = false;
 
   @override

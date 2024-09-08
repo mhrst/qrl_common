@@ -7,5 +7,5 @@ TextPainter textPainterForStyle(BuildContext context, TextStyle? style) =>
         style: style,
       ),
       textDirection: TextDirection.ltr,
-      textScaleFactor: MediaQuery.of(context).textScaleFactor,
+      textScaler: MediaQuery.textScalerOf(context),
     )..layout(maxWidth: 12.0);
