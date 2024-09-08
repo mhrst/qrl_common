@@ -1,4 +1,4 @@
-library common_flutter;
+library qrl_common_flutter;
 
 export 'core.dart';
 export 'src/flutter/app.dart';
